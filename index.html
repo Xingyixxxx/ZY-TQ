@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三枚铜钱起卦 — 易经占卜</title>
+    <meta name="description" content="传统三枚铜钱起卦法，体验古法易经占卜的庄重仪式感。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 背景装饰粒子 -->
+    <canvas id="bg-particles"></canvas>
+
+    <div class="container">
+        <!-- 标题区 -->
+        <header>
+            <div class="title-ornament">✦</div>
+            <h1>三枚铜钱起卦</h1>
+            <p class="subtitle">请静心片刻，默念所问之事<br>点击铜钱六次，自下而上成卦</p>
+            <div class="title-divider"></div>
+        </header>
+
+        <!-- 主要起卦区 -->
+        <main id="main-area">
+            <!-- 铜钱区 -->
+            <section class="coins-area" id="coins-area">
+                <div class="coin-container">
+                    <div class="coin" id="coin-1">
+                        <div class="coin-face coin-front">
+                            <div class="coin-inner-ring"></div>
+                            <span class="char char-top">乾</span>
+                            <span class="char char-bottom">隆</span>
+                            <span class="char char-left">通</span>
+                            <span class="char char-right">宝</span>
+                            <div class="coin-square-hole"></div>
+                        </div>
+                        <div class="coin-edge"></div>
+                        <div class="coin-face coin-back">
+                            <div class="coin-inner-ring"></div>
+                            <span class="manchu manchu-left">ᠠᠪᡴᠠᡳ</span>
+                            <span class="manchu manchu-right">ᠸᡝᡥᡝ</span>
+                            <div class="coin-square-hole"></div>
+                        </div>
+                    </div>
+                    <div class="coin-shadow"></div>
+                </div>
+                <div class="coin-container">
+                    <div class="coin" id="coin-2">
+                        <div class="coin-face coin-front">
+                            <div class="coin-inner-ring"></div>
+                            <span class="char char-top">乾</span>
+                            <span class="char char-bottom">隆</span>
+                            <span class="char char-left">通</span>
+                            <span class="char char-right">宝</span>
+                            <div class="coin-square-hole"></div>
+                        </div>
+                        <div class="coin-edge"></div>
+                        <div class="coin-face coin-back">
+                            <div class="coin-inner-ring"></div>
+                            <span class="manchu manchu-left">ᠠᠪᡴᠠᡳ</span>
+                            <span class="manchu manchu-right">ᠸᡝᡥᡝ</span>
+                            <div class="coin-square-hole"></div>
+                        </div>
+                    </div>
+                    <div class="coin-shadow"></div>
+                </div>
+                <div class="coin-container">
+                    <div class="coin" id="coin-3">
+                        <div class="coin-face coin-front">
+                            <div class="coin-inner-ring"></div>
+                            <span class="char char-top">乾</span>
+                            <span class="char char-bottom">隆</span>
+                            <span class="char char-left">通</span>
+                            <span class="char char-right">宝</span>
+                            <div class="coin-square-hole"></div>
+                        </div>
+                        <div class="coin-edge"></div>
+                        <div class="coin-face coin-back">
+                            <div class="coin-inner-ring"></div>
+                            <span class="manchu manchu-left">ᠠᠪᡴᠠᡳ</span>
+                            <span class="manchu manchu-right">ᠸᡝᡥᡝ</span>
+                            <div class="coin-square-hole"></div>
+                        </div>
+                    </div>
+                    <div class="coin-shadow"></div>
+                </div>
+            </section>
+
+            <!-- 投掷结果指示 -->
+            <section class="coin-result-indicators" id="coin-indicators">
+                <div class="indicator" id="indicator-1"><span>—</span></div>
+                <div class="indicator" id="indicator-2"><span>—</span></div>
+                <div class="indicator" id="indicator-3"><span>—</span></div>
+            </section>
+
+            <!-- 投掷控制区 -->
+            <section class="controls-area">
+                <button id="toss-btn">
+                    <span class="btn-icon">☰</span>
+                    <span class="btn-text">开始起卦</span>
+                </button>
+                <div class="progress-wrapper">
+                    <p id="progress-text">第 <span class="progress-current">0</span> / <span class="progress-total">6</span> 爻</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                <p id="status-text" class="status-msg">准备就绪，请点击开始起卦</p>
+            </section>
+
+            <!-- 六爻记录区 -->
+            <section class="records-area">
+                <h3>已生成爻列表</h3>
+                <ul id="lines-record">
+                    <!-- 爻记录项将通过 JS 动态插入 -->
+                </ul>
+            </section>
+        </main>
+
+        <!-- 结果展示区 (默认隐藏) -->
+        <section id="result-area" class="hidden">
+            <div id="hexagram-visual" class="hexagram-visual">
+                <div class="hexagram-box" id="original-hexagram">
+                    <h3>本卦 <span class="hexagram-name"></span></h3>
+                    <div class="lines-drawing"></div>
+                </div>
+                <div class="hexagram-arrow">→</div>
+                <div class="hexagram-box" id="changing-hexagram">
+                    <h3>变卦 <span class="hexagram-name"></span></h3>
+                    <div class="lines-drawing"></div>
+                </div>
+            </div>
+
+            <!-- 解释文字浮现区 -->
+            <div id="interpretation-box" class="interpretation-box hidden">
+                <div class="interpretation-content">
+                    <h4>本卦解释</h4>
+                    <p id="original-interpretation">暂无数据</p>
+                </div>
+                <div class="interpretation-content" id="changing-interpretation-wrap">
+                    <h4>变卦解释</h4>
+                    <p id="changing-interpretation">无动爻，本卦不变。</p>
+                </div>
+                <div class="actions">
+                    <button id="reset-btn">
+                        <span class="btn-icon">↺</span>
+                        <span class="btn-text">重新起卦</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>以诚心敬问 · 以智慧解惑</p>
+        </footer>
+    </div>
+
+    <script src="hexagramData.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
