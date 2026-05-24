@@ -9,15 +9,14 @@ const STATES = {
     RECORDING: 'recording',
     WAITING_NEXT: 'waitingNext',
     GENERATING: 'generatingHexagram',
-    SHOWING: 'showingHexagram',
-    FADING: 'fadingHexagram',
-    INTERPRETING: 'showingInterpretation'
+    SHOWING: 'showingHexagram'
 };
 
 let currentState = STATES.IDLE;
 let tossCount = 0;
 const MAX_TOSS = 6;
 let linesData = []; // 保存每一爻的数据
+let cardFlipped = false; // 翻转状态
 
 // DOM 元素
 const tossBtn = document.getElementById('toss-btn');
@@ -93,6 +92,11 @@ function initParticles() {
 function init() {
     tossBtn.addEventListener('click', handleToss);
     resetBtn.addEventListener('click', resetApp);
+
+    // 卡片翻转事件
+    const hexagramCard = document.getElementById('hexagram-card');
+    hexagramCard.addEventListener('click', toggleCardFlip);
+
     initParticles();
     resetApp();
 }
@@ -102,6 +106,7 @@ function resetApp() {
     currentState = STATES.IDLE;
     tossCount = 0;
     linesData = [];
+    cardFlipped = false;
 
     tossBtn.disabled = false;
     tossBtn.querySelector('.btn-text').textContent = '开始起卦';
@@ -115,10 +120,11 @@ function resetApp() {
     mainArea.classList.remove('hidden');
     resultArea.classList.add('hidden');
 
-    // 重置结果区状态
-    document.getElementById('hexagram-visual').classList.remove('fading');
-    document.getElementById('interpretation-box').classList.add('hidden');
-    document.getElementById('interpretation-box').classList.remove('show');
+    // 重置卡片翻转状态
+    const cardInner = document.getElementById('hexagram-card-inner');
+    if (cardInner) {
+        cardInner.classList.remove('flipped');
+    }
 
     // 重置硬币状态
     const coins = document.querySelectorAll('.coin');
@@ -137,6 +143,23 @@ function resetApp() {
     document.querySelectorAll('.coin-container').forEach(c => {
         c.classList.remove('tossing', 'landed');
     });
+}
+
+// ===================================================================
+// 翻转卡片
+// ===================================================================
+function toggleCardFlip() {
+    const cardInner = document.getElementById('hexagram-card-inner');
+    const flipHint = document.getElementById('flip-hint');
+    cardFlipped = !cardFlipped;
+
+    if (cardFlipped) {
+        cardInner.classList.add('flipped');
+        flipHint.innerHTML = '<span class="flip-icon">↻</span> 点击卡片翻回正面';
+    } else {
+        cardInner.classList.remove('flipped');
+        flipHint.innerHTML = '<span class="flip-icon">↻</span> 点击卡片翻转查看';
+    }
 }
 
 // ===================================================================
@@ -368,7 +391,7 @@ function recordResult(results) {
 }
 
 // ===================================================================
-// 生成完整卦象
+// 生成完整卦象 — 显示图片翻转卡片
 // ===================================================================
 function generateHexagram() {
     // 隐藏主区，显示结果区
@@ -376,72 +399,22 @@ function generateHexagram() {
     resultArea.classList.remove('hidden');
 
     const originalBinary = linesData.map(d => d.originalLine).join('');
-    const changingBinary = linesData.map(d => d.changingLine).join('');
-    const hasMoving = linesData.some(d => d.isMoving);
-
     const originalInfo = getHexagramInfo(originalBinary);
+    const order = originalInfo.order;
 
-    // 绘制本卦
-    drawHexagram('original-hexagram', linesData, 'originalLine', originalInfo);
+    // 设置正面和背面图片
+    const imgFront = document.getElementById('hexagram-img-front');
+    const imgBack = document.getElementById('hexagram-img-back');
+    imgFront.src = `photo/${order}-1.png`;
+    imgBack.src = `photo/${order}-2.jpg`;
+    imgFront.alt = `${originalInfo.name} 正面`;
+    imgBack.alt = `${originalInfo.name} 背面`;
 
-    // 绘制变卦
-    if (hasMoving) {
-        const changingInfo = getHexagramInfo(changingBinary);
-        document.getElementById('changing-hexagram').style.display = 'block';
-        document.querySelector('.hexagram-arrow').style.display = 'block';
-        drawHexagram('changing-hexagram', linesData, 'changingLine', changingInfo);
-
-        document.getElementById('original-interpretation').textContent = originalInfo.interpretation;
-        document.getElementById('changing-interpretation').textContent = changingInfo.interpretation;
-        document.getElementById('changing-interpretation-wrap').style.display = 'block';
-    } else {
-        document.getElementById('changing-hexagram').style.display = 'none';
-        document.querySelector('.hexagram-arrow').style.display = 'none';
-
-        document.getElementById('original-interpretation').textContent = originalInfo.interpretation;
-        document.getElementById('changing-interpretation').textContent = "无动爻，本卦不变。可重点参看本卦卦辞。";
-        document.getElementById('changing-interpretation-wrap').style.display = 'block';
-    }
+    // 重置翻转状态
+    cardFlipped = false;
+    document.getElementById('hexagram-card-inner').classList.remove('flipped');
 
     currentState = STATES.SHOWING;
-
-    // 停留 3 秒后触发虚化
-    setTimeout(() => {
-        currentState = STATES.FADING;
-        document.getElementById('hexagram-visual').classList.add('fading');
-
-        setTimeout(() => {
-            currentState = STATES.INTERPRETING;
-            const interpBox = document.getElementById('interpretation-box');
-            interpBox.classList.remove('hidden');
-            setTimeout(() => interpBox.classList.add('show'), 50);
-        }, 1000);
-
-    }, 3000);
-}
-
-// ===================================================================
-// 绘制单卦图形
-// ===================================================================
-function drawHexagram(containerId, lines, typeKey, info) {
-    const container = document.getElementById(containerId);
-    container.querySelector('.hexagram-name').textContent = info.name;
-
-    const drawingBox = container.querySelector('.lines-drawing');
-    drawingBox.innerHTML = '';
-
-    lines.forEach((line, index) => {
-        const lineDiv = document.createElement('div');
-        const isYang = line[typeKey] === 1;
-        lineDiv.className = `line ${isYang ? 'yang' : 'yin'}`;
-        if (line.isMoving) {
-            lineDiv.classList.add('moving');
-        }
-        // 添加逐行动画延迟
-        lineDiv.style.opacity = '0';
-        lineDiv.style.animation = `fadeSlideIn 0.4s ease-out ${index * 0.15}s forwards`;
-        drawingBox.appendChild(lineDiv);
-    });
 }
 
 // ===================================================================
