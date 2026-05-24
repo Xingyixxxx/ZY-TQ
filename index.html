@@ -122,34 +122,28 @@
 
         <!-- 结果展示区 (默认隐藏) -->
         <section id="result-area" class="hidden">
-            <div id="hexagram-visual" class="hexagram-visual">
-                <div class="hexagram-box" id="original-hexagram">
-                    <h3>本卦 <span class="hexagram-name"></span></h3>
-                    <div class="lines-drawing"></div>
+            <!-- 卦象图片翻转卡片 -->
+            <div class="hexagram-card-wrapper">
+                <div class="hexagram-card" id="hexagram-card">
+                    <div class="hexagram-card-inner" id="hexagram-card-inner">
+                        <div class="hexagram-card-front">
+                            <img id="hexagram-img-front" src="" alt="卦象正面">
+                        </div>
+                        <div class="hexagram-card-back">
+                            <img id="hexagram-img-back" src="" alt="卦象背面">
+                        </div>
+                    </div>
                 </div>
-                <div class="hexagram-arrow">→</div>
-                <div class="hexagram-box" id="changing-hexagram">
-                    <h3>变卦 <span class="hexagram-name"></span></h3>
-                    <div class="lines-drawing"></div>
-                </div>
+                <p class="flip-hint" id="flip-hint">
+                    <span class="flip-icon">↻</span> 点击卡片翻转查看
+                </p>
             </div>
 
-            <!-- 解释文字浮现区 -->
-            <div id="interpretation-box" class="interpretation-box hidden">
-                <div class="interpretation-content">
-                    <h4>本卦解释</h4>
-                    <p id="original-interpretation">暂无数据</p>
-                </div>
-                <div class="interpretation-content" id="changing-interpretation-wrap">
-                    <h4>变卦解释</h4>
-                    <p id="changing-interpretation">无动爻，本卦不变。</p>
-                </div>
-                <div class="actions">
-                    <button id="reset-btn">
-                        <span class="btn-icon">↺</span>
-                        <span class="btn-text">重新起卦</span>
-                    </button>
-                </div>
+            <div class="actions card-actions" id="card-actions">
+                <button id="reset-btn">
+                    <span class="btn-icon">↺</span>
+                    <span class="btn-text">重新起卦</span>
+                </button>
             </div>
         </section>
 
